@@ -35,7 +35,7 @@ from scipy.cluster.hierarchy import linkage, dendrogram
 
 # define the file path, load the data into a DataFrame, and view the first 5 rows
 path = 'GSE95077_Normalized_Count_Matrix_JJN3_Amiloride_and_CTRL.txt'
-data = pd.read_csv(file_path, sep='\t', index_col=0)
+data = pd.read_csv(path, sep='\t', index_col=0)
 data.head()
 ```
 Which, produces the following output:
@@ -91,9 +91,6 @@ Conversely, the rightmost chart is used to assess the variability and distributi
 Now, before moving on to quality control and filtering, we'll use one last visualization to explore the similarity, or dissimilarity, between our six samples:
 ```
 # [Python]
-# log transform counts
-log_counts = data_sig.apply(lambda x: np.log2(x + 1))
-
 # perform hierarchical clustering and create dendrogram
 h_clustering = linkage(log_counts.T, 'ward')
 plt.figure(figsize=(8, 6))
@@ -112,8 +109,24 @@ The chart above shows that our three control samples are clustered on the left, 
 
 ## 🧫 Quality Control, Filtering, and Normalization
 
+The next step in our analysis is to filter out genes with low expression levels across all samples, which can introduce noise in the data. By filtering these out, you can make your results more reliable and improve your statistical power, making detecting real biological differences between conditions easier. Additionally, filtering out genes with low expression counts decreases computational load by reducing the number of genes in your dataset, making future downstream analyses faster. In the code block below, I'll show you how perform basic filtering and normalization, then I'll break the code down step by step, explaining how it works:
+```
+# [Python]
+# create function to normalize and filter genes 
+def filter_genes(data, min_cpm=1, min_samples=3):
+    cpm = data.apply(lambda x: (x / x.sum()) * 1e6) 
+    mask = (cpm > min_cpm).sum(axis=1) >= min_samples 
+    return data[mask]
+# filter genes 
+data = filter_genes(data)
+```
+In the code block above, the ```filter_genes``` function normalizes the gene expression data to CPM (counts per million), then filters out genes that do not meet the criteria for minimum expression across a sufficient number of samples, thus achieving normalization and filtering in one swoop.
 
+CPM is a common normalization method used to account for differences in library sizes across samples. It works by scaling the raw counts to a common unit, allowing comparisons across samples. In the code block above, ```cpm = data.apply(lambda x: (x / x.sum()) * 1e6) ``` uses a lambda function. For each row (i.e., gene), the lambda function divides each value (i.e., count) by the sum of counts for that gene across all samples, then multiplies the result by 1*10^6, converting raw counts into CPM. 
 
+Then, ```mask = (cpm > min_cpm).sum(axis=1) >= min_samples``` identifies genes that have sufficient expression across a minimum number of samples, which helps retain genes that are sufficiently expressed in a significant number of samples. First, ```(cpm > min_cpm)```creates a boolean DataFrame where True indicates that the CPM for a given gene is greater than ```(min_cpm```. Then, ```.sum(axis=1)``` sums these boolean values across samples for each gene, resulting in the count of samplers where the gene's expression exceeds ```min_cpm```. Finally, ```>=min_samples``` checks if this count is greater than or equal to ```min_samples```, creating a boolean series where True indicates the gene meeting the filtering criteria. 
+
+Finally, ```return data[mask``` returns the subset of the original data that meets the filtering criteria. After calling this function with the code ```data = filter_genes(data)```, the result is that the data set is filtered from 23,044 genes down to 13,335 genes, significantly reducing the noise in the dataset. 
 
 ## 🧫 Differential Expression Analysis
 
