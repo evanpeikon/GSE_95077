@@ -238,10 +238,45 @@ Which, produces the following output:
 
 Notably, the data in this second volcano plot is much more sparse, as it only contains genes that met our filtering criteria of an adjusted p-value <0.1 and a log2 fold change >1. However, this plot does little to show us how these genes are related to one another, which will help us unravel amiloride's physiological effects. To better understand that, we can perform hierarchical clustering, which can help us understand how genes with differential expression are related and identify clusters of genes that may be similarly affected by the drug treatment.
 
-.... what is hierarchical clustering?
-.... heatmap with HC (visualizes the expression levels of genes. Clustering will reorder rows and columns based on similarity, allowing you to see patterns or clusters of co-expressed genes)
-.... dendrogram with HC (shows how genes /samples are clustered. The height of the branches indicates the distance or dissimilarity between clusters.
-) + detailed explanation of results 
+The first hierarchical clustering visualization we'll explore is a heatmap, which provides an integrated view of the data, showing not only how samples or features group together but also the magnitude of their values. In this code block below, I'll show you how to create this type of visualization:
+```
+significant_genes = deg['gene'].tolist()
+data_sig = data.loc[significant_genes]
+scaler = StandardScaler()
+data_sig_scaled = pd.DataFrame(scaler.fit_transform(data_sig.T).T, index=data_sig.index, columns=data_sig.columns)
+sns.clustermap(data_sig_scaled, method='ward', cmap='viridis', metric='euclidean', figsize=(10, 10), dendrogram_ratio=(0.2, 0.2))
+plt.show()
+```
+Which produces the following output:
+
+<img src="images/h_clustering1.png" alt="Description" width="600" height="500">
+
+Looking at the figure above, you should note that the rows and columns are clustered by sample and fold change. The three leftmost columns correspond to the control samples, and the three rightmost columns correspond to the experimental samples. In contrast, the y-axis is grouped based on whether genes were up or downregulated. For example, in the top right corner of the plot, you'll find genes whose expression was elevated in the experimental sample compared to the control sample. In the bottom left corner, you'll find genes whose expression was lower in the experimental sample compared to the control sample. 
+
+Additionally, the colors in the plot represent the magnitude of change, as described in the key in the upper left corner of the image. This chart also features both x-axis and y-axis dendrograms. The x-axis dendrogram at the top of the image clusters the samples by condition, whereas the y-axis dendrogram clustered genes based on their expression profiles and similarity. Because the dendrograms appended to the heatmap above are difficult to visualize, I've provided another code block below to generate a standalone dendrogram for visualizing the hierarchical clustering of differentially expressed genes:
+```
+significant_genes = deg['gene'].tolist()
+data_sig = data.loc[significant_genes]
+scaler = StandardScaler()
+data_sig_scaled = pd.DataFrame(scaler.fit_transform(data_sig.T).T, index=data_sig.index, columns=data_sig.columns)
+distance_matrix = pdist(data_sig_scaled, metric='euclidean')
+linkage_matrix = linkage(distance_matrix, method='ward')
+dendrogram(linkage_matrix, labels=data_sig.index, orientation='top', distance_sort='descending')
+plt.figure(figsize=(20, 7))
+plt.ylabel('Distance')
+plt.ylim(0, 3)
+plt.xticks(rotation=90)  
+plt.tight_layout()  
+plt.show()
+```
+Which produces the following output:
+
+<img src="images/h_clustering2.png" alt="Description" width="1000" height="400">
+
+When viewing the dendrogram above, there are three main points to focus on: the branches, the leaves, and the clusters. The branches are depicted as vertical lines, and the height at which two branches merge indicates the distance between the clusters. Thus, clusters connected by longer branches are more dissimilar to one another than clusters connected by shorter branches. In addition to branches, we have the leaves, which are the endpoints of the branches that correspond to individual genes. Now, when looking at the whole chart, we can see that leaves are part of hierarchical clusters. At the macro level, we have two main clusters representing genes that are down-regulated and up-regulated, respectively. Then, we have multiple layers of smaller nested clusters within each of those clusters. 
+
+In general, genes are grouped in clusters based on their expression profiles across samples, and thus, genes with similar expression profiles are more likely to be clustered together. Additionally, genes with similar functions or involved in related biological processes tend to cluster together as well (though this isn't always the case). 
+
 
 ## 🧫 Conclusion: What is Amilioride's Mechanism of Action? Is It Effective?
 
