@@ -132,7 +132,7 @@ The chart above shows that our three control samples are clustered on the left, 
 
 ## 🧫 Quality Control, Filtering, and Normalization
 
-The next step in our analysis is to filter out genes with low expression levels across all samples, which can introduce noise in the data. By filtering these out, you can make your results more reliable and improve your statistical power, making detecting real biological differences between conditions easier. Additionally, filtering out genes with low expression counts decreases computational load by reducing the number of genes in your dataset, making future downstream analyses faster. In the code block below, I'll show you how perform basic filtering and normalization, then I'll break the code down step by step, explaining how it works:
+The next step in our analysis is to filter out genes with low expression levels across all samples, which can introduce noise in the data. By filtering these out, you can make your results more reliable and improve your statistical power, making detecting real biological differences between conditions easier. Additionally, filtering out genes with low expression counts decreases computational load by reducing the number of genes in your dataset, making future downstream analyses faster. In the code block below, I'll show you how perform basic filtering and normalization:
 ```
 # [Python]
 # create function to normalize and filter genes 
@@ -143,15 +143,49 @@ def filter_genes(data, min_cpm=1, min_samples=3):
 # filter genes 
 data = filter_genes(data)
 ```
-In the code block above, the ```filter_genes``` function normalizes the gene expression data to CPM (counts per million), then filters out genes that do not meet the criteria for minimum expression across a sufficient number of samples, thus achieving normalization and filtering in one swoop.
+Now, let's break this code down step by step to see how it works:
 
-CPM is a common normalization method used to account for differences in library sizes across samples. It works by scaling the raw counts to a common unit, allowing comparisons across samples. In the code block above, ```cpm = data.apply(lambda x: (x / x.sum()) * 1e6) ``` uses a lambda function. For each row (i.e., gene), the lambda function divides each value (i.e., count) by the sum of counts for that gene across all samples, then multiplies the result by 1*10^6, converting raw counts into CPM. 
-
-Then, ```mask = (cpm > min_cpm).sum(axis=1) >= min_samples``` identifies genes that have sufficient expression across a minimum number of samples, which helps retain genes that are sufficiently expressed in a significant number of samples. First, ```(cpm > min_cpm)```creates a boolean DataFrame where True indicates that the CPM for a given gene is greater than ```(min_cpm```. Then, ```.sum(axis=1)``` sums these boolean values across samples for each gene, resulting in the count of samplers where the gene's expression exceeds ```min_cpm```. Finally, ```>=min_samples``` checks if this count is greater than or equal to ```min_samples```, creating a boolean series where True indicates the gene meeting the filtering criteria. 
-
-Finally, ```return data[mask``` returns the subset of the original data that meets the filtering criteria. After calling this function with the code ```data = filter_genes(data)```, the result is that the data set is filtered from 23,044 genes down to 13,335 genes, significantly reducing the noise in the dataset. 
+- In the code block above, the ```filter_genes``` function normalizes the gene expression data to CPM (counts per million), then filters out genes that do not meet the criteria for minimum expression across a sufficient number of samples, thus achieving normalization and filtering in one swoop.
+- CPM is a common normalization method used to account for differences in library sizes across samples. It works by scaling the raw counts to a common unit, allowing comparisons across samples. In the code block above, ```cpm = data.apply(lambda x: (x / x.sum()) * 1e6) ``` uses a lambda function. For each row (i.e., gene), the lambda function divides each value (i.e., count) by the sum of counts for that gene across all samples, then multiplies the result by 1*10^6, converting raw counts into CPM. 
+- Then, ```mask = (cpm > min_cpm).sum(axis=1) >= min_samples``` identifies genes that have sufficient expression across a minimum number of samples, which helps retain genes that are sufficiently expressed in a significant number of samples. First, ```(cpm > min_cpm)```creates a boolean DataFrame where True indicates that the CPM for a given gene is greater than ```(min_cpm```. Then, ```.sum(axis=1)``` sums these boolean values across samples for each gene, resulting in the count of samplers where the gene's expression exceeds ```min_cpm```. Finally, ```>=min_samples``` checks if this count is greater than or equal to ```min_samples```, creating a boolean series where True indicates the gene meeting the filtering criteria. 
+- Finally, ```return data[mask``` returns the subset of the original data that meets the filtering criteria. After calling this function with the code ```data = filter_genes(data)```, the result is that the data set is filtered from 23,044 genes down to 13,335 genes, significantly reducing the noise in the dataset. 
 
 ## 🧫 Differential Expression Analysis
+Now that we've loaded our data and performed quality control and normalization, we can perform differential expression analysis. In this case, I used a pairwise analysis, which involves comparing gene expression levels between individual pairs of control and experimental samples. For example, I compared control sample 1 to experimental sample 1, control sample 2 to experimental sample 2, etc. 
+
+Pairwise analyses are useful when working with small sample sizes, as we currently are. Additionally, pairwise comparison can be more precise because it compares matched samples, reducing variability caused by biological differences between samples and batch effects. In the code block below, I'll demonstrate how to perform a pairwise analysis, multiple testing corrections, and how to identify differentially expressed genes:
+```
+# [Python]
+results = []
+for gene in data.index:
+    control = data.loc[gene, ['JJ_AMIL_141050_INTER-Str_counts', 'JJ_AMIL_141056_INTER-Str_counts', 'JJ_AMIL_141062_INTER-Str_counts']]
+    treated = data.loc[gene, ['JJ_CTRL_141048_INTER-Str_counts', 'JJ_CTRL_141054_INTER-Str_counts', 'JJ_CTRL_141060_INTER-Str_counts']]
+    mean_control = np.mean(control)
+    mean_treated = np.mean(treated)
+    log2fc = np.log2((mean_treated + 1) / (mean_control + 1))  # Adding 1 to avoid log of 0
+    t_stat, p_val = ttest_ind(control, treated)
+    results.append({'gene': gene, 'log2fc': log2fc, 't_stat': t_stat, 'p_val': p_val})
+
+results_df = pd.DataFrame(results)
+
+results_df['p_adj'] = multipletests(results_df['p_val'], method='fdr_bh')[1]
+
+results_df['abs_log2fc'] = results_df['log2fc'].abs()
+
+deg = results_df[(results_df['p_adj'] < 0.01) & (results_df['abs_log2fc'] > 1)]
+```
+The code above performs a differential expression analysis on gene expression data, and the final output, ```deg```, is a DataFrame containing the genes that are significantly differentially expressed between the control and treated samples. Now, let's break this code down step by step to see how it works:
+
+- First, ```results = []``` initializes an empty list to store the results of the t-tests and fold change calculations for each gene.
+- Then, ```for gene in data.index:``` initializes a for loop to iterate over each gene in the dataset (recall, ```data.index:``` contains the gene identifiers for this dataset).
+    - 
+
+
+
+
+
+
+
 
 
 
