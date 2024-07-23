@@ -54,7 +54,7 @@ from scipy.stats import ttest_ind
 from statsmodels.stats.multitest import multipletests
 from sklearn.preprocessing import StandardScaler
 from scipy.spatial.distance import pdist, squareform
-from scipy.cluster.hierarchy import linkage, dendrogram
+from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
 
 # define the file path, load the data into a DataFrame, and view the first 5 rows
 path = 'GSE95077_Normalized_Count_Matrix_JJN3_Amiloride_and_CTRL.txt'
@@ -178,23 +178,74 @@ The code above performs a differential expression analysis on gene expression da
 
 - First, ```results = []``` initializes an empty list to store the results of the t-tests and fold change calculations for each gene.
 - Then, ```for gene in data.index:``` initializes a for loop to iterate over each gene in the dataset (recall, ```data.index:``` contains the gene identifiers for this dataset).
-    - 
+    - Next, ```control = data.loc[...etc]``` and ```treatment = data.loc[...etc]``` uses Panda's loc[] method to extract the expression levels for each gene in both the control and treatment samples.
+    - Following that, ```mean_control = np.mean(control)``` and ```mean_treated = np.mean(treated)``` calcualte the mean expression level for the control and treatment samples, then ```log2fc = np.log2((mean_treated + 1) / (mean_control + 1))``` computes the log2 fold change (the +1 is to avoid taking hte og of zero, which is undefined).
+    - Then, ```t_stat, p_val = ttest_ind(control, treated)``` performs an independent t-test to determine is there is a statisically significant differnce in the expression levels between the control and treatment samples, and ```results.append(...etc)``` appends the gene's identifier, log2 fold change, t-statistic, and p-value to the results list.
+- After that, ```results_df = pd.DataFrame(results)``` convert the results list into a pandas DataFrame.
+- Then, ```results_df['p_adj'] = multipletests(results_df['p_val'], method='fdr_bh')[1]``` adjusts the p-values for multiple testing, using the Benjamini-Hochberg method, and ```results_df['abs_log2fc'] = results_df['log2fc'].abs()``` calculates the absolute value of the log2 fold change for each gene and stores it in a new columns labeled ```abs_log2fc```.
+- Finally, ```deg = results_df[(results_df['p_adj'] < 0.01) & (results_df['abs_log2fc'] > 1)]``` filters the genes and retains only those that meet the following criteria: a adjusted p-value less than 0.01, and an absolute log2 fold change greater than 1. 
 
+Note - I chose to use a p-value threhsold of 0.01 instead of 0.05 to make my analysis more stringent and reduce the number of false positives. Whether this is appropriate depends on the specific context and the trade-off between sensitivity (detecting true positives) and specificity (avoiding false positives) that you are willing to accept. In this case, I know that a p-value cutoff of 0.01 may result in us missing some truly differentially expressed genes because the threshold is more stringent.
 
+Now that we have a list of differentially expressed genes, we can sort them based on their absolute log2 fold change and adjusted p-value, then display the results for the top 25 genes, as demonstrated below:
+```
+# [Python]
+top_genes = deg.sort_values(by=['abs_log2fc', 'p_adj'], ascending=[False, True])
+top_25_genes = top_genes.head(25)
+print(top_25_genes[['gene', 'abs_log2fc', 'p_adj']])
+```
+Which produces the following output:
 
+<img src="images/top25_DEG.png" alt="Description" width="300" height="350">
 
+Notably, the image above displays absolute log2 fold changes, which measure the magnitude of change without regard to direction. This type of visualization is useful when you are interested in genes that show significant changes in expression, regardless of whether they are upregulated or downregulated. However, it's not particularly useful for understanding a drug's mechanism of action. Thus, in the next section, we'll stratify genes by their adjusted p values and log2 fold changes to understand whether they are up and down-regulated and to what degree that is significant. 
 
+## 🧫 Visualizing Differentially Expressed Genes
+The first visualization we'll use to understand our data is a volcano plot. A volcano plot is a type of scatter plot commonly used in genomics and other areas of bioinformatics to visualize the results of differential expression analysis and help identify statistically significant changes in gene expression between different conditions. In the code block below, I'll demonstrate how to create a volcano plot using our data frame of filtered differentially expressed genes. The first plot will be from our ```results_df``` DataFrame before filtering, then the second plot will be from our ```deg``` DataFrame, a 
+after filtering out genes that do not meet our selection criteria:
+```
+plt.figure(figsize=(8, 6))
+sns.scatterplot(data=results_df, x='log2fc', y='p_adj', hue='log2fc', palette='viridis', alpha=0.9, edgecolor=None)
+plt.axhline(y=0.01, color='red', linestyle='-', linewidth=1) 
+plt.axvline(x=1, color='blue', linestyle='-', linewidth=1)  
+plt.axvline(x=-1, color='blue', linestyle='-', linewidth=1) 
+plt.xlabel('log2 Fold Change')
+plt.ylabel('Adjusted P-value')
+plt.legend(title='log2 Fold Change', loc='lower left')
+plt.show()
+```
+Which, produces the following output:
 
+<img src="images/volcano2.png" alt="Description" width="600" height="400">
 
+As you can see in the image above, our volcano plot combines two critical pieces of information for each gene: the magnitude of change (fold change) and the statistical significance (p-value) of that change. Specifically, the x-axis on this graph shows the log2 fold change between the control and experimental samples in our pairwise analysis. A positive value indicates an upregulation of a gene in the experimental group compared to the control, and a negative value represents downregulation of a gene in the experimental group compared to the control. Additionally, the y-axis shows the significance of said change in gene expression. Thus, when viewing this graph, we are most interested in the two boxes formed in the lower left and lower right corners, which represent down-regulated and up-regulated genes with high statistical significance. 
 
+Now, in the code block below, I'll show you how to produce a volcano plot containing only genes that met our filtering criteria:
+```
+plt.figure(figsize=(8, 6))
+sns.scatterplot(data=deg, x='log2fc', y='p_adj', hue='log2fc', palette='viridis', alpha=0.9, edgecolor=None)
+plt.axhline(y=0.01, color='red', linestyle='-', linewidth=1) 
+plt.axvline(x=1, color='blue', linestyle='-', linewidth=1)  
+plt.axvline(x=-1, color='blue', linestyle='-', linewidth=1) 
+plt.xlabel('log2 Fold Change')
+plt.ylabel('Adjusted P-value')
+plt.legend(title='log2 Fold Change', loc='lower left')
+plt.show()
+```
+Which, produces the following output:
 
+<img src="images/volcano.png" alt="Description" width="600" height="400">
 
-## 🧫 Visualizing and Understanding the Results
+Notably, the data in this second volcano plot is much more sparse, as it only contains genes that met our filtering criteria of an adjusted p-value <0.1 and a log2 fold change >1. However, this plot does little to show us how these genes are related to one another, which will help us unravel amiloride's physiological effects. To better understand that, we can perform hierarchical clustering, which can help us understand how genes with differential expression are related and identify clusters of genes that may be similarly affected by the drug treatment.
 
-
+.... what is hierarchical clustering?
+.... heatmap with HC (visualizes the expression levels of genes. Clustering will reorder rows and columns based on similarity, allowing you to see patterns or clusters of co-expressed genes)
+.... dendrogram with HC (shows how genes /samples are clustered. The height of the branches indicates the distance or dissimilarity between clusters.
+) + detailed explanation of results 
 
 ## 🧫 Conclusion: What is Amilioride's Mechanism of Action? Is It Effective?
 
+- what does amilioride do (recap from above)
 - bring in mouse data for effectivenss 
 
 
