@@ -281,15 +281,13 @@ In general, genes are grouped in clusters based on their expression profiles acr
 
 In the last section, we saw that amiloride upregulates and downregulates a myriad of genes to a statistically significant degree. Additionally, we performed hierarchical clustering to group a number of these genes together to better understand amiloride's mechanisms of action and effects. 
 
-Notably, several oncogenes, such as ALDOA, PH4B, EE1A, and CD74, were down-regulated in the experimental group compared to the control group, recapitulating the results of several preclinical studies exploring the potential anticancer effects of amiloride. 
+Notably, several oncogenes, such as ALDOA, PH4B, EE1A, and CD74, were down-regulated in the experimental group compared to the control group, recapitulating the results of several preclinical studies exploring the potential anticancer effects of amiloride. For example, in the paper [Amiloride, An Old Diuretic Drug, Is a Potential Therapeutic Agent for Multiple Myeloma](https://aacrjournals.org/clincancerres/article/23/21/6602/259285/Amiloride-An-Old-Diuretic-Drug-Is-a-Potential) the investigators found that amilioride decreased cell growth in vitro, and that amilioride induced significant apoptosis in myeloma cells 24 and 48 hours folling treatment, as depicted in the image below:
+
+<img src="images/study_fig2a.png" alt="Description" width="700" height="300">
 
 However, our analyses also show that amiloride significantly increased the expression of genes such as CGREF1, among many others, which have been shown to have both tumor-suppressive and oncogenic functions depending on the context. As a result, we need to be very careful when analyzing gene expression data, particularly when thousands of genes are differentially expressed between control and experimental (i.e., treatment) samples, many of which have redundant or contradictory effects. 
 
 This can be explained by the fact that drugs can affect multiple signaling pathways simultaneously, and the effects of a drug can also vary depending on the specific cancer type and its microenvironment. For example, a drug might activate a pathway that enhances tumor suppressor gene expression while also inadvertently activating pathways that lead to increased oncogene expression. Additionally, in some cancers, the same drug might enhance the expression of genes with both tumor-suppressive and oncogenic roles, depending on the tumor's molecular characteristics and stage. As a result, it's important to integrate other data sources when trying to understand a drug's mechanism of action, physiological effects, and effectiveness. 
-
-For example.... [integrate other data into discussion]
-
-
 
 #
 [1] Rojas EA, Corchete LA, San-Segundo L, Martínez-Blanch JF et al. Amiloride, An Old Diuretic Drug, Is a Potential Therapeutic Agent for Multiple Myeloma. Clin Cancer Res 2017 Nov 1;23(21):6602-6615. PMID: 28790111
