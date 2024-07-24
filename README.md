@@ -292,6 +292,9 @@ This can be explained by the fact that drugs can affect multiple signaling pathw
 #
 [1] Rojas EA, Corchete LA, San-Segundo L, Martínez-Blanch JF et al. Amiloride, An Old Diuretic Drug, Is a Potential Therapeutic Agent for Multiple Myeloma. Clin Cancer Res 2017 Nov 1;23(21):6602-6615. PMID: 28790111
 
+## Accessibility 
+You can access a copy of the Juypter notebook with all of my code from this project repositiry [here](https://github.com/evanpeikon/GSE_95077/blob/main/code/GSE95077.ipynb). Alternativley, you can access section specific code blocks from this README [here](https://github.com/evanpeikon/GSE_95077/tree/main/code/code_blocks).
+
 
 
 
