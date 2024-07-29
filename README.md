@@ -32,15 +32,13 @@ After obtaining gene expression data, we can assess differential expression by c
 The data from this study were made available via the Gene Expression Omnibus under the accession number [GSE95077](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE95077).  To access this data, I used Bash's ```wget``` command, which allows you to download files from the internet using the HTTP, HTTPS, or FTP protocols. 
 
 In the code block below, I'll demonstrate how to access the count matrix data from this study, which contains a measure of gene expression for every gene in each cell line sample, and how to decompress the data using Bash's ```gunzip``` command:
-```
-# [Bash]
+```bash
 wget -O GSE95077_Normalized_Count_Matrix_JJN3_Amiloride_and_CTRL.txt.gz 'https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE95077&format=file&file=GSE95077%5FNormalized%5FCount%5FMatrix%5FJJN3%5FAmiloride%5Fand%5FCTRL%2Etxt%2Egz'
 
 gunzip GSE95077_Normalized_Count_Matrix_JJN3_Amiloride_and_CTRL.txt
 ```
 Following that, I'll show you how to import the libraries needed for this project and how to load the count matrix data into a Pandas DataFrame:
-```
-# [Python]
+```python
 # import libraries
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -66,8 +64,7 @@ Which, produces the following output:
 The data frame above is indexed by gene ID (ENSG), and then there are six columns of RNA-sequencing expression data (i.e., counts). The first three columns contain expression counts for the control group, and the last three columns contain expression counts for the experimental group (i.e., the amiloride treatment group). Note that both groups use the JJN3 cell line, which was established from the bone marrow of a 57-year-old woman with plasma cell leukemia.
 
 Next, we'll want to perform preliminary data analysis to understand the distribution and variability of RNA sequencing counts across the samples and check for missing data before performing any downstream analysis. First, let's check out the sample quality:
-```
-# [Python]
+```python
 # check for missing values and get summary statistics 
 print(data.isnull().sum())
 print(data.describe())
@@ -77,8 +74,7 @@ Which, produces the following output:
 <img src="images/summary_stats.png" alt="Description" width="400" height="450">
 
 Notably, the dataset has no null (missing) values, and all samples' total counts (i.e., gene IDs) are the same. Next, we'll explore the distribution and variability in the dataset, as demonstrated in the code block below:
-```
-# [Python]
+```python
 # calcualte total counts per sample and log transform counts
 total_counts = data.sum(axis=0)
 log_counts = data.apply(lambda x: np.log2(x + 1)) #+1 ensures zero counts are transformed to log2(1) = 0 instead of being undefined
@@ -110,8 +106,7 @@ The chart on the left, titled "Total Counts," helps visualize the overall sequen
 Conversely, the rightmost chart is used to assess the variability and distribution of gene expression counts across samples. In this case, we can see that the boxes, representing the interquartile range, and the whiskers, representing variability outside the upper and lower quartiles, are of similar sizes across the samples, indicating a consistent data distribution. 
 
 Now, before moving on to quality control and filtering, we'll use one last visualization to explore the similarity, or dissimilarity, between our six samples:
-```
-# [Python]
+```python
 # perform hierarchical clustering and create dendrogram
 h_clustering = linkage(log_counts.T, 'ward')
 plt.figure(figsize=(8, 6))
@@ -131,8 +126,7 @@ The chart above shows that our three control samples are clustered on the left, 
 ## 🧫 Quality Control, Filtering, and Normalization
 
 The next step in our analysis is to filter out genes with low expression levels across all samples, which can introduce noise in the data. By filtering these out, you can make your results more reliable and improve your statistical power, making detecting real biological differences between conditions easier. Additionally, filtering out genes with low expression counts decreases computational load by reducing the number of genes in your dataset, making future downstream analyses faster. In the code block below, I'll show you how perform basic filtering and normalization:
-```
-# [Python]
+```python
 # create function to normalize and filter genes 
 def filter_genes(data, min_cpm=1, min_samples=3):
     cpm = data.apply(lambda x: (x / x.sum()) * 1e6) 
@@ -152,8 +146,7 @@ Now, let's break this code down step by step to see how it works:
 Now that we've loaded our data and performed quality control and normalization, we can perform differential expression analysis. In this case, I used a pairwise analysis, which involves comparing gene expression levels between individual pairs of control and experimental samples. For example, I compared control sample 1 to experimental sample 1, control sample 2 to experimental sample 2, etc. 
 
 Pairwise analyses are useful when working with small sample sizes, as we currently are. Additionally, pairwise comparison can be more precise because it compares matched samples, reducing variability caused by biological differences between samples and batch effects. In the code block below, I'll demonstrate how to perform a pairwise analysis, multiple testing corrections, and how to identify differentially expressed genes:
-```
-# [Python]
+```python
 results = []
 for gene in data.index:
     control = data.loc[gene, ['JJ_AMIL_141050_INTER-Str_counts', 'JJ_AMIL_141056_INTER-Str_counts', 'JJ_AMIL_141062_INTER-Str_counts']]
@@ -186,8 +179,7 @@ The code above performs a differential expression analysis on gene expression da
 Note - I chose to use a p-value threhsold of 0.01 instead of 0.05 to make my analysis more stringent and reduce the number of false positives. Whether this is appropriate depends on the specific context and the trade-off between sensitivity (detecting true positives) and specificity (avoiding false positives) that you are willing to accept. In this case, I know that a p-value cutoff of 0.01 may result in us missing some truly differentially expressed genes because the threshold is more stringent.
 
 Now that we have a list of differentially expressed genes, we can sort them based on their absolute log2 fold change and adjusted p-value, then display the results for the top 25 genes, as demonstrated below:
-```
-# [Python]
+```python
 top_genes = deg.sort_values(by=['abs_log2fc', 'p_adj'], ascending=[False, True])
 top_25_genes = top_genes.head(25)
 print(top_25_genes[['gene', 'abs_log2fc', 'p_adj']])
@@ -201,7 +193,7 @@ Notably, the image above displays absolute log2 fold changes, which measure the 
 ## 🧫 Visualizing Differentially Expressed Genes
 The first visualization we'll use to understand our data is a volcano plot. A volcano plot is a type of scatter plot commonly used in genomics and other areas of bioinformatics to visualize the results of differential expression analysis and help identify statistically significant changes in gene expression between different conditions. In the code block below, I'll demonstrate how to create a volcano plot using our data frame of filtered differentially expressed genes. The first plot will be from our ```results_df``` DataFrame before filtering, then the second plot will be from our ```deg``` DataFrame, a 
 after filtering out genes that do not meet our selection criteria:
-```
+```python
 plt.figure(figsize=(8, 6))
 sns.scatterplot(data=results_df, x='log2fc', y='p_adj', hue='log2fc', palette='viridis', alpha=0.9, edgecolor=None)
 plt.axhline(y=0.01, color='red', linestyle='-', linewidth=1) 
@@ -219,7 +211,7 @@ Which, produces the following output:
 As you can see in the image above, our volcano plot combines two critical pieces of information for each gene: the magnitude of change (fold change) and the statistical significance (p-value) of that change. Specifically, the x-axis on this graph shows the log2 fold change between the control and experimental samples in our pairwise analysis. A positive value indicates an upregulation of a gene in the experimental group compared to the control, and a negative value represents downregulation of a gene in the experimental group compared to the control. Additionally, the y-axis shows the significance of said change in gene expression. Thus, when viewing this graph, we are most interested in the two boxes formed in the lower left and lower right corners, which represent down-regulated and up-regulated genes with high statistical significance. 
 
 Now, in the code block below, I'll show you how to produce a volcano plot containing only genes that met our filtering criteria:
-```
+```python
 plt.figure(figsize=(8, 6))
 sns.scatterplot(data=deg, x='log2fc', y='p_adj', hue='log2fc', palette='viridis', alpha=0.9, edgecolor=None)
 plt.axhline(y=0.01, color='red', linestyle='-', linewidth=1) 
@@ -237,7 +229,7 @@ Which, produces the following output:
 Notably, the data in this second volcano plot is much more sparse, as it only contains genes that met our filtering criteria of an adjusted p-value <0.1 and a log2 fold change >1. However, this plot does little to show us how these genes are related to one another, which will help us unravel amiloride's physiological effects. To better understand that, we can perform hierarchical clustering, which can help us understand how genes with differential expression are related and identify clusters of genes that may be similarly affected by the drug treatment.
 
 The first hierarchical clustering visualization we'll explore is a heatmap, which provides an integrated view of the data, showing not only how samples or features group together but also the magnitude of their values. In this code block below, I'll show you how to create this type of visualization:
-```
+```python
 significant_genes = deg['gene'].tolist()
 data_sig = data.loc[significant_genes]
 scaler = StandardScaler()
@@ -252,7 +244,7 @@ Which produces the following output:
 Looking at the figure above, you should note that the rows and columns are clustered by sample and fold change. The three leftmost columns correspond to the control samples, and the three rightmost columns correspond to the experimental samples. In contrast, the y-axis is grouped based on whether genes were up or downregulated. For example, in the top right corner of the plot, you'll find genes whose expression was elevated in the experimental sample compared to the control sample. In the bottom left corner, you'll find genes whose expression was lower in the experimental sample compared to the control sample. 
 
 Additionally, the colors in the plot represent the magnitude of change, as described in the key in the upper left corner of the image. This chart also features both x-axis and y-axis dendrograms. The x-axis dendrogram at the top of the image clusters the samples by condition, whereas the y-axis dendrogram clustered genes based on their expression profiles and similarity. Because the dendrograms appended to the heatmap above are difficult to visualize, I've provided another code block below to generate a standalone dendrogram for visualizing the hierarchical clustering of differentially expressed genes:
-```
+```python
 significant_genes = deg['gene'].tolist()
 data_sig = data.loc[significant_genes]
 scaler = StandardScaler()
