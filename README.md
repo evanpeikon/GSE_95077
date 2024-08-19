@@ -353,7 +353,7 @@ Additionally, the colors in the plot represent the magnitude of change, as descr
 
 In general, genes are grouped in clusters based on their expression profiles across samples, and thus, genes with similar expression profiles are more likely to be clustered together. Additionally, genes with similar functions or involved in related biological processes tend to cluster together as well (though this isn't always the case). 
 
-### Functional Enrichment Analysis
+## Functional Enrichment Analysis
 **Gene Ontology (GO) Analysis**
 
 Now that we've identified a number of differentially expressed genes. which perform a series of functional enrichment analyses, which allow us to identify and interpret the biological functions, processes, and pathways that are overrepresented or significant in our list of differenrentially expressed genes, thus helping us uncover Amilioride's mechansm of action. 
@@ -375,50 +375,50 @@ Which produces the following outputs:
 
 <img src="images/DEA_8.png" alt="Description" width="500" height="400">
 
-** 👽 FIXME!** Explain what this means, etc. 
+The gene ontology (GO) analysis results offer significant insights into the effects of the potential cancer drug. Key findings include the identification of several highly significant biological processes and cellular components, such as "cytoplasm," "small molecule metabolic process," and "Mitochondrial inheritance." These terms highlight both broad and specific biological processes and conditions influenced by the drug.
+
+The precision and recall values for these terms reveal varying degrees of relevance and coverage. For instance, "cytoplasm" has high precision (0.735) but low recall (0.024), meaning that while this term is highly relevant to the identified genes, only a small portion of the relevant genes were captured. Conversely, terms like "Leber optic atrophy" exhibit high recall (0.800) but lower precision (0.061), indicating that although many relevant genes were identified, the specificity of these associations is lower.
+
+In the context of evaluating a potential cancer drug, these results are particularly informative. The drug's impact on fundamental cellular processes, such as those involving the cytoplasm and small molecule metabolism, suggests potential pathways through which the drug may exert its effects. Additionally, the identification of terms related to specific diseases may reveal potential off-target effects or broader impacts of the drug, guiding further research and development.
 
 **Pathway Analysis**
 
-Gene Ontology (GO) analysis is valuable for identifying broad biological changes associated with gene expression, but it might not always reveal specific pathways affected by a drug treatment. To address this, we will also conduct pathway analysis. Pathway analysis focuses on pinpointing signaling and metabolic pathways that are enriched among differentially expressed genes, offering insights into how genes interact within specific biological pathways.
+Gene Ontology (GO) analysis is useful for identifying broad biological changes associated with gene expression, but it may not always pinpoint specific pathways affected by drug treatment. To address this limitation, we will also perform pathway analysis. Pathway analysis focuses on identifying signaling and metabolic pathways that are enriched among differentially expressed genes, providing insights into how these genes interact within specific biological pathways.
 
-While GO analysis provides a general overview, pathway analysis offers a more detailed perspective by mapping differentially expressed genes to known biological pathways, such as those documented in the KEGG or Reactome databases. This approach helps to elucidate how genes work together in biological systems and can highlight key pathways altered by treatment, which is crucial for understanding complex biological mechanisms and identifying potential therapeutic targets.
+While GO analysis offers a general overview of biological processes and cellular components, pathway analysis provides a more detailed perspective. It maps differentially expressed genes to established biological pathways, such as those documented in KEGG or Reactome databases. This approach clarifies how genes collaborate within biological systems and highlights key pathways altered by the drug treatment. This detailed understanding is crucial for unraveling complex biological mechanisms and identifying potential therapeutic targets.
 
-In the context of studying the effects of a cancer drug, pathway analysis is especially valuable. It helps to identify specific biological processes and pathways that the drug influences, shedding light on the drug’s mechanism of action and its impact on cellular functions. For example, uncovering pathways related to energy metabolism and oxidative stress can reveal how the drug disrupts cellular processes critical to cancer progression. Now, in the code block below i'll show you how to perform pathway analysis. 
+For studying the effects of a cancer drug, pathway analysis is particularly valuable. It helps identify specific biological processes and pathways influenced by the drug, revealing insights into the drug's mechanism of action and its impact on cellular functions. For example, detecting pathways related to energy metabolism and oxidative stress can elucidate how the drug affects cellular processes crucial for cancer progression. Below, I will show you how to perform pathway analysis using the code provided.
 
 ```python
-# perform pathway analysis
+# perform pathway analysis and display the results 
 pathway_analysis_results = gp.profile( organism='hsapiens',  query=gene_list, sources=["KEGG", "REAC"])
-
-# display the results
 print(pathway_analysis_results.head())
 ```
 Which produces the following output:
 
 <img src="images/DEA_9.png" alt="Description" width="600" height="500">
 
+In the context of myeloma therapy, these pathway analysis results suggest that the drug has a notable impact on key energy and metabolic pathways. By affecting the citric acid cycle, oxidative phosphorylation, and related metabolic processes, the drug may impair the energy production and metabolic adaptability of myeloma cells. Additionally, the influence on ROS-related pathways highlights the potential for the drug to induce oxidative stress or disrupt ROS management, offering further insights into its mechanism of action. Overall, these findings suggest that the drug might effectively target critical processes in myeloma cells, offering a promising approach for therapy.
 
 Now, we can visualize the top ten enriched pathways using the code below.
 
+```python=
+sns.barplot(x='intersection_size', y='name', data=pathway_analysis_results.head(10))
+plt.title('Top 10 Pathways')
+plt.xlabel('Term size')
+plt.ylabel('Pathway')
+plt.show()
+```
 
 Which produces the following output:
 <img src="images/DEA_10.png" alt="Description" width="750" height="400">
 
+##  Conclusion: What is Amilioride's Mechanism of Action? Is It Effective?
 
-
-###  Conclusion: What is Amilioride's Mechanism of Action? Is It Effective?
-
- In the paper [Amiloride, An Old Diuretic Drug, Is a Potential Therapeutic Agent for Multiple Myeloma](https://aacrjournals.org/clincancerres/article/23/21/6602/259285/Amiloride-An-Old-Diuretic-Drug-Is-a-Potential) the investigators found that amilioride decreased cell growth in vitro, and that amilioride induced significant apoptosis in myeloma cells 24 and 48 hours folling treatment, as depicted in the image below:
+Amiloride, traditionally known as a diuretic, has emerged as a promising therapeutic agent for multiple myeloma, as evidenced by recent studies. The paper ["Amiloride, An Old Diuretic Drug, Is a Potential Therapeutic Agent for Multiple Myeloma"](https://aacrjournals.org/clincancerres/article/23/21/6602/259285/Amiloride-An-Old-Diuretic-Drug-Is-a-Potential) highlights that amiloride effectively decreases cell growth and induces significant apoptosis in myeloma cells within 24 to 48 hours of treatment, as demonstrated in the image below. These findings are further supported by the gene ontology (GO) and pathway analysis results, which reveal that amiloride significantly impacts critical cellular processes, particularly those involved in energy metabolism and oxidative stress.
 
 <img src="images/study_fig2a.png" alt="Description" width="700" height="300">
 
+The pathway analysis indicates that amiloride affects key pathways such as the citric acid cycle, oxidative phosphorylation, and respiratory electron transport. These pathways are crucial for cellular energy production and mitochondrial function. The observed decrease in cell growth and increased apoptosis in myeloma cells can be attributed to amiloride's ability to disrupt these vital energy-producing processes, thereby impairing cancer cell metabolism and inducing cell death. Additionally, the impact on pathways related to reactive oxygen species (ROS) suggests that amiloride may exacerbate oxidative stress, further contributing to its pro-apoptotic effects.
 
-
-#
-[1] Rojas EA, Corchete LA, San-Segundo L, Martínez-Blanch JF et al. Amiloride, An Old Diuretic Drug, Is a Potential Therapeutic Agent for Multiple Myeloma. Clin Cancer Res 2017 Nov 1;23(21):6602-6615. PMID: 28790111
-
-## Accessibility 
-You can access a copy of the Juypter notebook with all of my code from this project repository [here](https://github.com/evanpeikon/GSE_95077/blob/main/code/GSE95077.ipynb). Alternativley, you can access section specific code blocks from this README [here](https://github.com/evanpeikon/GSE_95077/tree/main/code/code_blocks).
-
-
-
-
+Given these insights, amiloride’s mechanism of action in myeloma cells appears to involve the disruption of energy metabolism and induction of oxidative stress, which together inhibit cell growth and promote apoptosis. The combination of these effects makes amiloride a compelling candidate for further investigation as a potential myeloma therapy. Its existing clinical use as a diuretic and its demonstrated efficacy in preclinical models warrant deeper exploration to assess its therapeutic potential and safety in treating multiple myeloma.
