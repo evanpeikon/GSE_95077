@@ -356,7 +356,7 @@ In general, genes are grouped in clusters based on their expression profiles acr
 ## Functional Enrichment Analysis
 **Gene Ontology (GO) Analysis**
 
-Now that we've identified a number of differentially expressed genes. which perform a series of functional enrichment analyses, which allow us to identify and interpret the biological functions, processes, and pathways that are overrepresented or significant in our list of differenrentially expressed genes, thus helping us uncover Amilioride's mechansm of action. 
+Now that we've identified a number of differentially expressed genes, we'll perform a series of functional enrichment analyses, which allow us to identify and interpret the biological functions, processes, and pathways that are overrepresented or significant in our list of differenrentially expressed genes, thus helping us uncover Amilioride's mechansm of action. 
 
 The first analysis we'll explore is Gene Ontology (GO) analysis, which categorizes differentially expressed genes according to their associated biological processes, cellular components, and molecular functions. This categorization is based on a structured, hierarchical vocabulary known as the Gene Ontology, which systematically describes gene functions. 
 
