@@ -1,38 +1,21 @@
-# 🧫 Project Introduction
+# 🧬 Project Introduction
 
-In this project repository I'll be analyzing RNA-sequencing data from a study titled, Amiloride, [An Old Diuretic Drug, Is a Potential Therapeutic Agent for Multiple Myeloma](https://aacrjournals.org/clincancerres/article/23/21/6602/259285/Amiloride-An-Old-Diuretic-Drug-Is-a-Potential)[1]. 
+In this project repository I'll be analyzing RNA-sequencing data from a study titled, [Amiloride, An Old Diuretic Drug, Is a Potential Therapeutic Agent for Multiple Myeloma](https://aacrjournals.org/clincancerres/article/23/21/6602/259285/Amiloride-An-Old-Diuretic-Drug-Is-a-Potential). 
 
 In this study, myeloma cell lines and a xenograft mouse model (i.e., a mouse with human tumor cells implanted in it) were used to evaluate the drug amiloride's toxicity (i.e., cell-killing effects). Additionally, amilioride's mechanism of action was investigated using RNA-Seq experiments, qRT-PCR, immunoblotting, and immunofluorescence assays.
 
 The investigators in this study found amiloride-induced apoptosis in a broad panel of multiple myeloma cell lines and in the xenograft mouse model. Additionally, they found that amiloride has a synergistic effect when combined with other drugs, such as dexamethasone and melphalan.
 
-In this project repository, I will analyze the RNA-sequencing data from this study, made available via the Gene Expression Omnibus (GEO), to better understand amiloride's mechanism of action and effects, with special attention dedicated to analyzing differentially expressed genes and their physiological functions. If you're unfamiliar with differential expression analysis and how it works, I recommend reading the sub-section below titled "Scientific Background" before proceeding. Otherwise, you can skip the section titled "Loading Data & Exploratory Data Analysis."
+In this project repository, I will analyze the RNA-sequencing data from this study, made available via the Gene Expression Omnibus (GEO), to better understand amiloride's mechanism of action and effects, with special attention dedicated to analyzing differentially expressed genes and their physiological functions. If you're unfamiliar with differential expression analysis and how it works, I recommend reading the provided documentation titled [Scientific Background](https://github.com/evanpeikon/GSE_95077/blob/project_branch_2/scientific_background.md) before proceeding. 
 
-### Scientific Background
-**What Is Differential Gene Expression?**
+# 🧬 Project Walkthrough 
 
-Gene expression is the process by which information encoded in a gene is used to create a functional gene product, typically a protein or RNA molecule. The first step of gene expression is transcription, which is when the DNA sequence coding for a gene is transcribed into messenger RNA (mRNA) by the enzyme RNA polymerase, as demonstrated in the figure below ([image source](https://www.technologynetworks.com/genomics/articles/rna-polymerase-function-and-definition-346823)). 
+## Data Availability
+The data for this project comes from a study called "Amiloride, An Old Diuretic Drug, Is a Potential Therapeutic Agent for Multiple Myeloma," which is accessible via the Gene Expression Omnibus (GEO) via the following accession number: [GSE95077](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE95077). 
 
-<img src="images/DEA1.jpg" alt="Description" width="600" height="300">
+Additionally, we can access the bulk RNA-sequencing data, from each sample, using the following accension numbers: [GSM2495770](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM2495770) , [GSM2495771](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM2495771) , [GSM2495772](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM2495772) , [GSM2495767](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM2495767) , [GSM2495768](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM2495768) , [GSM2495769](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM2495769).
 
-The mRNA is then translated into a functional protein with the help of ribosomes and transfer RNA (tRNA), as shown in the image below ([image source](https://en.wikipedia.org/wiki/Transfer_RNA)). Gene expression is a tightly regulated process that allows cells to respond to environmental cues, perform specific functions, and adapt to changing conditions. Not all genes are expressed at all times, and the expression level can vary between different cell types, tissues, and developmental stages. In other words, genes can be differentially expressed, which refers to the ability of genes to be "turned on" or "turned off" in response to specific factors or changes in the cellular environment.
-
-<img src="images/DEA2.jpg" alt="Description" width="600" height="300">
-
-Differential expression analysis is a fundamental technique in bioinformatics used to identify differentially expressed genes between two or more biological conditions, such as healthy and diseased tissues, or before and after a treatment. To perform differential expression analysis, we must perform statistical analysis to discover quantitative changes in expression levels between experimental groups. For example, we use statistical testing to decide whether, for a given gene, an observed difference in read counts is significant, that is, whether it is greater than what would be expected just due to natural random variation.
-
-**How Do We Know Genes Are Differentially Expressed?**
-
-Differential expression analysis aims to understand how gene expression levels change under different conditions, providing insights into the molecular mechanisms underlying biological processes. Before performing differential expression analysis, we need to quantify gene expression levels. This can be done with RNA sequencing (RNA-seq) and microarrays, which are used to identify genes being actively transcribed. RNA-Seq, a cutting-edge technique, reads the entire transcriptome, providing a nuanced and dynamic understanding of gene activity. In contrast, microarrays, akin to genetic snapshots, capture a snapshot of gene expression levels at a given moment. 
-
-After obtaining gene expression data, we can assess differential expression by comparing the expression of genes under different experimental conditions. For example, researchers might compare gene expression in healthy and diseased tissues or in the presence and absence of a specific treatment, or they may investigate expression under different environmental conditions. A gene is considered upregulated if its expression increases by a statistically significant degree in a particular condition and downregulated if its expression decreases by a statistically significant degree. 
-
-# 🧫 Project Walkthrough 
-
-### Data Availability
-The data from this study were made available via the Gene Expression Omnibus under the accession number [GSE95077](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE95077). 
-
-### Import Libraries
+## Import Libraries
 Before loading the data above, I'll first import the following Python libraries, which will be used in downstream analyses:
 
 ```python
@@ -50,7 +33,7 @@ from scipy.stats import mannwhitneyu
 from statsmodels.stats.multitest import multipletests
 ```
 
-### Load, Insepct, and Clean Data
+## Load, Inspect, and Prepare Data
 Next, we'll use Bash's ```wget``` command to retrieve our bulk RNA-seq data, and following that, we'll use the Bash ```gunzip``` command to decompress the files:
 
 ```python
@@ -71,9 +54,9 @@ Which, produces the following output:
 
 <img src="images/data_head.png" alt="Description" width="1000" height="175">
 
-The data frame above is indexed by gene ID (ENSG), and then there are six columns of RNA-sequencing expression data (i.e., counts). The first three columns contain expression counts for the control group, and the last three columns contain expression counts for the experimental group (i.e., the amiloride treatment group). Note that both groups use the JJN3 cell line, which was established from the bone marrow of a 57-year-old woman with plasma cell leukemia.
+The data frame above is indexed by Ensemble gene ID (ENSG), and then there are six columns of RNA-sequencing expression data (i.e., counts). The first three columns contain expression counts for the control group, and the last three columns contain expression counts for the experimental group (i.e., the amiloride treatment group). Note that both groups use the JJN3 cell line, which was established from the bone marrow of a 57-year-old woman with plasma cell leukemia.
 
-Next, we'll want to perform preliminary data analysis to understand the distribution and variability of RNA sequencing counts across the samples and check for missing data before performing any downstream analysis. First, let's check out the sample quality:
+Next, we'll want to perform preliminary data analysis to understand the distribution and variability of RNA sequencing counts across the samples and check for missing data before performing any downstream analysis. First, let's check out our sample quality:
 
 ```python
 # check for missing values 
@@ -83,20 +66,19 @@ Which, produces the following output:
 
 <img src="images/DEA_1.png" alt="Description" width="200" height="125">
 
-Notably, the dataset has no null (missing) values. Now, before moving on we'll want to get the corresponding gene names for each ensemble gene ID in our data set, then add the gene names to a new column, which I'll demonstrate in the code block below. 
+Notably, the dataset has no null (missing) values. Now, the next step in our data preperation process is to get the corresponding gene names for each Ensemble gene ID in our data set, then add said gene names to a new column, which i'll demonstrate in the code block below. 
 
 ```python
-# get corresponding gene names for ea/ ensemble ID and add gene names to new column
-mg = mygene.MyGeneInfo()
-ensembl_ids = data_frame.index.tolist()
-gene_info = mg.querymany(ensembl_ids, scopes='ensembl.gene', fields='symbol', species='human')
-gene_df = pd.DataFrame(gene_info)
-gene_df = gene_df.dropna(subset=['symbol']).drop_duplicates(subset='query')
-data_frame['Gene_Name'] = data_frame.index.map(gene_df.set_index('query')['symbol'])
-cols = ['Gene_Name'] + [col for col in data_frame.columns if col != 'Gene_Name']
-data_frame = data_frame[cols]
+mg = mygene.MyGeneInfo() # initialize MyGeneInfo object to query gene information
+ensembl_ids = data_frame.index.tolist() # extract ensemble IDs from index of DF
+gene_info = mg.querymany(ensembl_ids, scopes='ensembl.gene', fields='symbol', species='human') # query MyGeneInfo for gene symbols using ensemble IDs
+gene_df = pd.DataFrame(gene_info) # convert query result to DF
+gene_df = gene_df.dropna(subset=['symbol']).drop_duplicates(subset='query') # drop rows w/ missing gene symbols and duplicate ensemble IDs
+data_frame['Gene_Name'] = data_frame.index.map(gene_df.set_index('query')['symbol']) # map ensemble IDs to gene symbols and add gene names to a new column in the original DF
+cols = ['Gene_Name'] + [col for col in data_frame.columns if col != 'Gene_Name'] # reorder columns to place 'Gene_Name' as the first column
+data_frame = data_frame[cols] # rearrange DF columns
 ```
-Next, we'll drop the current index in the DataFrame containing ensemble IDs, then make the first column, containing gene names, the new index. 
+Next, we'll drop the current index in the DataFrame containing the Ensemble gene IDs, then make the first column, containing gene names, our new index. 
 
 ```python
 # drop current index w/ ensemble IDs, then make column 0 w/ gene names the new index
@@ -108,8 +90,7 @@ Which produces the following output:
 
 <img src="images/DEA_2.png" alt="Description" width="1000" height="175">
 
-
-Next, we'll explore the distribution and variability in the dataset, as demonstrated in the code block below:
+Next, we'll explore the distribution and variability in our dataset, as demonstrated in the code block below:
 ```python
 # calcualte total counts per sample and log transform counts
 total_counts = data_frame.sum(axis=0)
@@ -118,13 +99,13 @@ log_counts = data_frame.apply(lambda x: np.log2(x + 1))
 # create subplots
 fig, axes = plt.subplots(1, 2, figsize=(18, 6))
 
-# subplot 1: total counts per sample
+# plot total counts per sample
 axes[0].bar(data_frame.columns, total_counts, color='skyblue')
 axes[0].set_ylabel('Total Counts')
 axes[0].set_title('Total Counts per Sample')
 axes[0].tick_params(axis='x', rotation=85)
 
-# subplot 2: log transformed counts per sample
+# plot log transformed counts per sample
 log_counts.boxplot(ax=axes[1])
 axes[1].set_ylabel('Log2(Counts + 1)')
 axes[1].set_title('Log Transformed Counts per Sample')
@@ -137,7 +118,7 @@ Which produces the following output:
 
 <img src="images/EDA.png" alt="Description" width="1000" height="450">
 
-The chart on the left, titled "Total Counts," helps visualize the overall sequencing depth across the samples. Ideally, the bars, representing the total counts, should be of similar height, indicating that sequencing depth is consistent across samples, which is the case with this data set. 
+The chart on the left, titled "Total Counts Per Sample," helps visualize the overall sequencing depth across the samples. Ideally, the bars, representing the total counts, should be of similar height, indicating that sequencing depth is consistent across samples, which is the case with this data set. 
 
 Conversely, the rightmost chart is used to assess the variability and distribution of gene expression counts across samples. In this case, we can see that the boxes, representing the interquartile range, and the whiskers, representing variability outside the upper and lower quartiles, are of similar sizes across the samples, indicating a consistent data distribution. 
 
@@ -167,22 +148,44 @@ To determine the optimal filtering criteria, I'll plot the number of genes retai
 
 ```python
 def plot_genes_retained_by_cpm(data, min_samples=3):
-    cpm = data.apply(lambda x: (x / x.sum()) * 1e6)  # Convert raw counts to CPM
-    thresholds = np.arange(0, 5, 0.1)  # Test CPM thresholds from 0 to 5 in 0.1 increments
+    """
+    Plots the number of genes retained as a function of different CPM thresholds
+    
+    Parameters:
+    - data: DF with raw count data where rows are genes and columns are samples.
+    - min_samples: min number of samples in which a gene must have a CPM greater than the threshold to be retained.
+    """
+    # convert raw counts to CPM to normalize the data
+    cpm = data.apply(lambda x: (x / x.sum()) * 1e6)
+
+    # define a range of CPM thresholds to test, from 0 to 5 with increments of 0.1
+    thresholds = np.arange(0, 5, 0.1)
+    
+    # initialize list to store the # of genes retained for ea/ threshold
     genes_retained = []
 
+    # loop through ea/ threshold value to determine the # of genes retained
     for min_cpm in thresholds:
+        # create mask where CPM > min_cpm in at least min_samples samples
         mask = (cpm > min_cpm).sum(axis=1) >= min_samples
-        genes_retained.append(mask.sum())  # Count number of genes retained
+        
+        # count # of genes that meet the criteria and append to the list
+        genes_retained.append(mask.sum())
 
+    # plot # of genes retained as a function of CPM threshold
     plt.figure(figsize=(10, 6))
     plt.plot(thresholds, genes_retained, marker='o', color='green')
-    plt.axvline(x=1.0, color='red', linestyle='--', label='CPM = 1') #put line at 1 as rough heuristic
+    
+    # add vertical line at CPM = 1 as a rough heuristic for comparison
+    plt.axvline(x=1.0, color='red', linestyle='--', label='CPM = 1')
+
+    # add labels
     plt.xlabel('Threshold (CPM)')
     plt.ylabel('Num Genes Retained')
     plt.legend()
     plt.show()
 
+# call function
 plot_genes_retained_by_cpm(data_frame)
 ```
 <img src="images/DEA_3.png" alt="Description" width="600" height="400">
@@ -191,63 +194,90 @@ Based on the data in the chart above, we'll filter genes with an expression thre
 
 ```python
 def filter_normalize(data, min_cpm=0.75, min_samples=3):
-    # filter genes based on CPM thresholds
-    cpm = data.apply(lambda x: (x / x.sum()) * 1e6)  # Convert raw counts to CPM
-    mask = (cpm > min_cpm).sum(axis=1) >= min_samples  # Keep genes with CPM > min_cpm in min_samples
-    filtered_data = data[mask]
+    """
+    Filter and normalize gene expression data.
 
-    # Apply global scaling normalization
+    Parameters:
+    - data: raw gene expression data where rows represent genes and columns represent samples.
+    - min_cpm: min counts per million (CPM) threshold for filtering genes.
+    - min_sample: min number of samples with CPM above min_cpm to keep a gene.
+
+    Returns:
+    - pd.DataFrame: filtered and normalized gene expression data.
+    """
+    
+    # convert raw counts to CPM
+    cpm = data.apply(lambda x: (x / x.sum()) * 1e6)  
+    
+    # filter genes based on CPM thresholds
+    mask = (cpm > min_cpm).sum(axis=1) >= min_samples # keep genes with CPM > min_cpm in at least min_samples
+    filtered_data = data[mask]  # apply filter 
+
+    # Compute geometric mean of non-zero values for each gene
     geometric_means = filtered_data.apply(lambda row: np.exp(np.log(row[row > 0]).mean()), axis=1)
+    
+    # calculate size factors by dividing each gene expression by its geometric mean
     size_factors = filtered_data.div(geometric_means, axis=0).median(axis=0)
+    
+    # normalize data by dividing each gene expression by the size factors
     normalized_data = filtered_data.div(size_factors, axis=1)
 
+    # return normalized data as DF w/ the same index and columns as the filtered data
     return pd.DataFrame(normalized_data, index=filtered_data.index, columns=filtered_data.columns)
 
-# Overwrite dataframe with filtered and normalized data
+# overwrite DF with filtered and normalized data
 data_frame = filter_normalize(data_frame)
 ```
-Now, let's break this code down step by step to see how it works:
 
-** 👽 FIXME!**
-
-
-## 🧫 Differential Expression Analysis
+## Differential Expression Analysis
 Now that we've loaded our data and performed quality control and normalization, we can perform differential expression analysis. In this case, I used a pairwise analysis, which involves comparing gene expression levels between individual pairs of control and experimental samples. For example, I compared control sample 1 to experimental sample 1, control sample 2 to experimental sample 2, etc. 
 
 Pairwise analyses are useful when working with small sample sizes, as we currently are. Additionally, pairwise comparison can be more precise because it compares matched samples, reducing variability caused by biological differences between samples and batch effects. In the code block below, I'll demonstrate how to perform a pairwise analysis, multiple testing corrections, and how to identify differentially expressed genes:
 
 ```python
+# initilize list to store results for each gene
 results = []
+
 for gene in data_frame.index:
+    # extract control group data for the current gene
     control = data_frame.loc[gene, ['JJ_AMIL_141050_INTER-Str_counts', 'JJ_AMIL_141056_INTER-Str_counts', 'JJ_AMIL_141062_INTER-Str_counts']]
+    # extract treated group data for the current gene
     treated = data_frame.loc[gene, ['JJ_CTRL_141048_INTER-Str_counts', 'JJ_CTRL_141054_INTER-Str_counts', 'JJ_CTRL_141060_INTER-Str_counts']]
+
+    # calculate mean expression levels for control and treated groups
     mean_control = np.mean(control)
     mean_treated = np.mean(treated)
+
+    # compute log2 fold change, adding 1 to avoid taking log of 0
     log2fc = np.log2((mean_treated + 1) / (mean_control + 1))  # Adding 1 to avoid log of 0
+
+    # perform t-test to compare control and treated groups
     t_stat, p_val = ttest_ind(control, treated)
+
+    # append results for the current gene to the results list
     results.append({'gene': gene, 'log2fc': log2fc, 't_stat': t_stat, 'p_val': p_val})
 
+# convert results list to DF for easier manipulation
 results_df = pd.DataFrame(results)
 
-# Convert p_val to numeric, coercing errors to NaN
+# convert p-values to numeric values, coercing errors to NaN if conversion fails, then drop rows where p-values are NaN
 results_df['p_val'] = pd.to_numeric(results_df['p_val'], errors='coerce')
-
-# drop NAN
 results_df = results_df.dropna(subset=['p_val'])
+
+# extract p-values as a numpy array for multiple testing correction
 pvals = results_df['p_val'].values  # Convert to numpy array
 
+# apply multiple testing correction using Benjamini-Hochberg method
 results_df['p_adj'] = multipletests(results_df['p_val'], method='fdr_bh')[1]
 
+# calculate the absolute value of log2 fold change
 results_df['abs_log2fc'] = results_df['log2fc'].abs()
 
+# filter results to get differentially expressed genes with adjusted p-value < 0.05 and |log2fc| > 1
 deg = results_df[(results_df['p_adj'] < 0.05) & (results_df['abs_log2fc'] > 1)]
 ```
 
-The code above performs a differential expression analysis on gene expression data, and the final output, ```deg```, is a DataFrame containing the genes that are significantly differentially expressed between the control and treated samples. Now, let's break this code down step by step to see how it works:
-
-** 👽 FIXME!**
-
-Now that we have a dataframe of differentially expressed genes, we can view the distribution of Absolute log fold changes, as demonstrated in the code block below. 
+The code above performs a differential expression analysis on gene expression data, and the final output, ```deg```, is a DataFrame containing the genes that are significantly differentially expressed between the control and treated samples. Now that we have a dataframe of differentially expressed genes, we can view the distribution of Absolute log fold changes, as demonstrated in the code block below. 
 
 ```python
 # view distribution of scores
@@ -266,8 +296,7 @@ Which produces the following output:
 Notably, the image above displays the total number of genes at each absolute log-2 fold change. You'll notice that the bulk of genes hover around of low-end threshold of 1.0, with a small subset of genes having an absolute log-2 fold change of >2.0. 
 
 ## 🧫 Visualizing Differentially Expressed Genes
-The first visualization we'll use to understand our data is a volcano plot. A volcano plot is a type of scatter plot commonly used in genomics and other areas of bioinformatics to visualize the results of differential expression analysis and help identify statistically significant changes in gene expression between different conditions. In the code block below, I'll demonstrate how to create a volcano plot using our data frame of filtered differentially expressed genes. The first plot will be from our ```results_df``` DataFrame before filtering, then the second plot will be from our ```deg``` DataFrame, a 
-after filtering out genes that do not meet our selection criteria:
+The first visualization we'll use to understand our data is a volcano plot. A volcano plot is a type of scatter plot commonly used in genomics and other areas of bioinformatics to visualize the results of differential expression analysis and help identify statistically significant changes in gene expression between different conditions. In the code block below, I'll demonstrate how to create a volcano plot using our data frame of filtered differentially expressed genes. The first plot will be from our ```results_df``` DataFrame before filtering, then the second plot will be from our ```deg``` DataFrame, a after filtering out genes that do not meet our selection criteria:
 
 ```python
 plt.figure(figsize=(8, 6))
@@ -325,7 +354,7 @@ Additionally, the colors in the plot represent the magnitude of change, as descr
 In general, genes are grouped in clusters based on their expression profiles across samples, and thus, genes with similar expression profiles are more likely to be clustered together. Additionally, genes with similar functions or involved in related biological processes tend to cluster together as well (though this isn't always the case). 
 
 ### Functional Enrichment Analysis
-
+** Gene Ontology (GO) Analysis **
 Now that we've identified a number of differentially expressed genes. which perform a series of functional enrichment analyses, which allow us to identify and interpret the biological functions, processes, and pathways that are overrepresented or significant in our list of differenrentially expressed genes, thus helping us uncover Amilioride's mechansm of action. 
 
 The first analysis we'll explore is Gene Ontology (GO) analysis, which categorizes differentially expressed genes according to their associated biological processes, cellular components, and molecular functions. This categorization is based on a structured, hierarchical vocabulary known as the Gene Ontology, which systematically describes gene functions. 
@@ -335,18 +364,11 @@ While differential expression analysis identifies genes that are up- or down-reg
 Now, I'll show you how to perform  GO analysis, as demonstrated in the code block below.
 
 ```python
-# Extract the list of gene names for DEGs
-
-gene_list = deg['gene'].tolist()
-
-# Initialize g:Profiler
-gp = GProfiler(return_dataframe=True)
-
-# Perform GO analysis using the significant gene list
-go_results = gp.profile(organism='hsapiens', query=gene_list)
-
-# Display the first few results
-print(go_results.head())
+# extract the list of gene names for differentially expressed genes (DEGs)
+gene_list = deg['gene'].tolist() # convert the 'gene' column from the DataFrame containing DEGs to a list
+gp = GProfiler(return_dataframe=True) # initialize g:Profiler for functional enrichment analysis. Set return_dataframe=True to get results in a DataFrame format
+go_results = gp.profile(organism='hsapiens', query=gene_list) # perform Gene Ontology (GO) analysis using the list of significant genes
+print(go_results.head()) # display the first few rows of the results to review the analysis output
 ```
 Which produces the following outputs:
 
@@ -354,11 +376,12 @@ Which produces the following outputs:
 
 ** 👽 FIXME!** Explain what this means, etc. 
 
-GO analysis is useful for highlighting general biological changes, but it may not always pinpoint specific pathways affected by a drug. As a result, we'll also perform pathway analysis, which is used to identify signaling and metabolic pathways that are enriched in a list of differentially expressed genes, helping us understand how genes interact within specific pathways.
+** Pathway Analysis**
+Gene Ontology (GO) analysis is valuable for identifying broad biological changes associated with gene expression, but it might not always reveal specific pathways affected by a drug treatment. To address this, we will also conduct pathway analysis. Pathway analysis focuses on pinpointing signaling and metabolic pathways that are enriched among differentially expressed genes, offering insights into how genes interact within specific biological pathways.
 
-While similar to GO analysis, pathway analysis is more specific in that it maps differentially expressed genes to known biological pathways, such as those in KEGG or Reactome databases. This provides a detailed view of how genes function together in biological systems and can identify key pathways that are altered by treatment, which can help us understand complex biological mechanisms and identify potential therapeutic targets.
+While GO analysis provides a general overview, pathway analysis offers a more detailed perspective by mapping differentially expressed genes to known biological pathways, such as those documented in the KEGG or Reactome databases. This approach helps to elucidate how genes work together in biological systems and can highlight key pathways altered by treatment, which is crucial for understanding complex biological mechanisms and identifying potential therapeutic targets.
 
-Given that we are studying the effects of a cancer drug, pathway analysis is particularly useful as it helps identify specific biological processes and pathways that the drug affects. This can provide insights into the drug’s mechanism of action and its impact on cellular functions. For instance, identifying pathways related to energy metabolism and oxidative stress can directly link to how the drug alters cellular processes relevant to cancer.
+In the context of studying the effects of a cancer drug, pathway analysis is especially valuable. It helps to identify specific biological processes and pathways that the drug influences, shedding light on the drug’s mechanism of action and its impact on cellular functions. For example, uncovering pathways related to energy metabolism and oxidative stress can reveal how the drug disrupts cellular processes critical to cancer progression. Now, in the code block below i'll show you how to perform pathway analysis. 
 
 ```python
 # perform pathway analysis
