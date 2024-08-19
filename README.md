@@ -81,7 +81,7 @@ print(data.isnull().sum())
 ```
 Which, produces the following output:
 
-<img src="images/DEA_1.png" alt="Description" width="400" height="450">
+<img src="images/DEA_1.png" alt="Description" width="200" height="125">
 
 Notably, the dataset has no null (missing) values. Now, before moving on we'll want to get the corresponding gene names for each ensemble gene ID in our data set, then add the gene names to a new column, which I'll demonstrate in the code block below. 
 
@@ -106,7 +106,7 @@ data_frame.head()
 ```
 Which produces the following output:
 
-<img src="images/DEA_2.png" alt="Description" width="1000" height="450">
+<img src="images/DEA_2.png" alt="Description" width="1000" height="175">
 
 
 Next, we'll explore the distribution and variability in the dataset, as demonstrated in the code block below:
@@ -185,7 +185,7 @@ def plot_genes_retained_by_cpm(data, min_samples=3):
 
 plot_genes_retained_by_cpm(data_frame)
 ```
-<img src="images/DEA_3.png" alt="Description" width="1000" height="450">
+<img src="images/DEA_3.png" alt="Description" width="600" height="400">
 
 Based on the data in the chart above, we'll filter genes with an expression threshold of <0.75 CPM. For many bulk RNA-seq datasets, a CPM threshold of 1 is a common filtering point, but 0.75 is slightly more lenient is justifiable given the distribution of our data. Now, In the code block below, I'll show you how perform basic filtering and normalization. 
 
@@ -261,7 +261,7 @@ plt.show()
 ```
 Which produces the following output:
 
-<img src="images/DEA_4.png" alt="Description" width="300" height="350">
+<img src="images/DEA_4.png" alt="Description" width="600" height="350">
 
 Notably, the image above displays the total number of genes at each absolute log-2 fold change. You'll notice that the bulk of genes hover around of low-end threshold of 1.0, with a small subset of genes having an absolute log-2 fold change of >2.0. 
 
@@ -350,7 +350,7 @@ print(go_results.head())
 ```
 Which produces the following outputs:
 
-<img src="images/DEA_8.png" alt="Description" width="600" height="500">
+<img src="images/DEA_8.png" alt="Description" width="500" height="400">
 
 ** 👽 FIXME!** Explain what this means, etc. 
 
@@ -376,7 +376,7 @@ Now, we can visualize the top ten enriched pathways using the code below.
 
 
 Which produces the following output:
-<img src="images/DEA_10.png" alt="Description" width="600" height="500">
+<img src="images/DEA_10.png" alt="Description" width="750" height="400">
 
 
 
