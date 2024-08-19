@@ -354,7 +354,7 @@ Additionally, the colors in the plot represent the magnitude of change, as descr
 In general, genes are grouped in clusters based on their expression profiles across samples, and thus, genes with similar expression profiles are more likely to be clustered together. Additionally, genes with similar functions or involved in related biological processes tend to cluster together as well (though this isn't always the case). 
 
 ### Functional Enrichment Analysis
-** Gene Ontology (GO) Analysis **
+**Gene Ontology (GO) Analysis**
 
 Now that we've identified a number of differentially expressed genes. which perform a series of functional enrichment analyses, which allow us to identify and interpret the biological functions, processes, and pathways that are overrepresented or significant in our list of differenrentially expressed genes, thus helping us uncover Amilioride's mechansm of action. 
 
@@ -377,7 +377,7 @@ Which produces the following outputs:
 
 ** 👽 FIXME!** Explain what this means, etc. 
 
-** Pathway Analysis**
+**Pathway Analysis**
 
 Gene Ontology (GO) analysis is valuable for identifying broad biological changes associated with gene expression, but it might not always reveal specific pathways affected by a drug treatment. To address this, we will also conduct pathway analysis. Pathway analysis focuses on pinpointing signaling and metabolic pathways that are enriched among differentially expressed genes, offering insights into how genes interact within specific biological pathways.
 
