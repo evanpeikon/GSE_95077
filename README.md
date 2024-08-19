@@ -355,6 +355,7 @@ In general, genes are grouped in clusters based on their expression profiles acr
 
 ### Functional Enrichment Analysis
 ** Gene Ontology (GO) Analysis **
+
 Now that we've identified a number of differentially expressed genes. which perform a series of functional enrichment analyses, which allow us to identify and interpret the biological functions, processes, and pathways that are overrepresented or significant in our list of differenrentially expressed genes, thus helping us uncover Amilioride's mechansm of action. 
 
 The first analysis we'll explore is Gene Ontology (GO) analysis, which categorizes differentially expressed genes according to their associated biological processes, cellular components, and molecular functions. This categorization is based on a structured, hierarchical vocabulary known as the Gene Ontology, which systematically describes gene functions. 
@@ -377,6 +378,7 @@ Which produces the following outputs:
 ** 👽 FIXME!** Explain what this means, etc. 
 
 ** Pathway Analysis**
+
 Gene Ontology (GO) analysis is valuable for identifying broad biological changes associated with gene expression, but it might not always reveal specific pathways affected by a drug treatment. To address this, we will also conduct pathway analysis. Pathway analysis focuses on pinpointing signaling and metabolic pathways that are enriched among differentially expressed genes, offering insights into how genes interact within specific biological pathways.
 
 While GO analysis provides a general overview, pathway analysis offers a more detailed perspective by mapping differentially expressed genes to known biological pathways, such as those documented in the KEGG or Reactome databases. This approach helps to elucidate how genes work together in biological systems and can highlight key pathways altered by treatment, which is crucial for understanding complex biological mechanisms and identifying potential therapeutic targets.
